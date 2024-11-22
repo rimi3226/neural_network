@@ -1,5 +1,7 @@
 import replaceNumpy as rnp
 import math
+import numpy as np
+
 def sigmoid(matrix):
     """
     시그모이드 활성화 함수 적용
@@ -51,12 +53,31 @@ def leaky_relu(matrix, alpha=0.01):
     """
     return [[x if x > 0 else alpha * x for x in row] for row in matrix]  # Leaky ReLU 구현
 
-def softmax(matrix):
-    result = []
-    for row in matrix:
-        max_value = max(row)
-        shifted_row = [x - max_value for x in row]  # 안정화
-        exp_row = [math.exp(x) for x in shifted_row]
-        sum_exp_row = sum(exp_row)
-        result.append([value / sum_exp_row for value in exp_row])
-    return result
+# def softmax(matrix):
+#     """
+#     소프트맥스 활성화 함수 적용
+
+#     Args:
+#         matrix (list): 입력 벡터(1D) 또는 행렬(2D)
+
+#     Returns:
+#         list: 각 요소에 softmax(x)를 적용한 결과
+#     """
+#     # 1차원 리스트 처리
+#     if isinstance(matrix[0], (float, int)):  # 1D case
+#         max_value = max(matrix)  # 최대값
+#         exp_row = [math.exp(x - max_value) for x in matrix]  # exp(x - max)
+#         sum_exp_row = sum(exp_row)  # exp 합계
+#         return [value / sum_exp_row for value in exp_row]  # 확률값 계산
+
+#     # 2차원 리스트 처리
+#     softmax_result = []
+#     for row in matrix:
+#         max_value = max(row)  # 최대값
+#         exp_row = [math.exp(x - max_value) for x in row]  # exp(x - max)
+#         sum_exp_row = sum(exp_row)  # exp 합계
+#         softmax_result.append([value / sum_exp_row for value in exp_row])  # 확률값 계산
+#     return softmax_result
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()

@@ -87,11 +87,13 @@ class neuralNetwork:
         print(f"Layer {len(self.layers)}: Forward Propagation with activation {self.output_activation}")
         output_layer.nodes=af.softmax(output_layer.nodes)
         
-        self.plot_layer_nodes(output_layer.nodes, len(self.layers))
+        
+        # 인덱스 생성
+        x = range(len(output_layer.nodes[0]))
+        print(len(output_layer.nodes[0]))
         print(output_layer.nodes)
-        print(output_layer.nodes.index(1.0))
 
-
+        self.plot_layer_nodes(output_layer.nodes[0],len(output_layer.nodes[0]))
 
     def train(self, inputs, targets, epochs, batch_size, loss_function="MSE"):
         """신경망 학습"""
