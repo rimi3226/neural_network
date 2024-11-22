@@ -7,27 +7,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../util
 import replaceNumpy as rnp
 import activationFunc as af 
 
+# 레이어
 class Layer:
+    # 레이어 초기화
     def __init__(self, layer_size, weight_init_method="None"):
-        """신경망 레이어 초기화
-
-        Args:
-            layer_size (int): 레이어 노드 수
-            weight_init_method (str): 가중치 초기화 방법 ("Xavier", "He", "std", "None")
-        """
         self.layer_size = layer_size
-        self.nodes = rnp.zeros(layer_size)  # 0으로 초기화된 노드 생성
-        self.biases = rnp.zeros(layer_size)  # 0으로 초기화된 편향 생성
-        self.weights = None  # 가중치 초기화
-        self.next_layer = None  # 다음 레이어 연결
+        self.nodes = None 
+        self.weights = None 
+        self.next_layer = None 
 
+    # 가중치 초기화
     def initialize_weights(self, next_layer_size, method="Xavier"):
-        """가중치 초기화
-
-        Args:
-            next_layer_size (int): 다음 레이어의 노드 개수
-            method (str): 초기화 방법 ("Xavier", "He", "std")
-        """
         if method == "std":
             self.weights = rnp.random_matrix(self.layer_size, next_layer_size)
         elif method == "Xavier":
@@ -39,40 +29,26 @@ class Layer:
         else:
             raise ValueError(f"Invalid weight initialization method: {method}")
 
+    # 레이어간 연결
     def set_next_layer(self, next_layer):
-        """다음 레이어 할당
-
-        Args:
-            next_layer (Layer): 연결할 다음 레이어
-        """
         self.next_layer = next_layer
 
+    # 순전파 계산
     def forward(self, input_data, activation="sigmoid"):
-        """활성화 값을 계산하여 저장
-
-        Args:
-            input_data (list): 입력 데이터
-            activation (str): 활성화 함수 ("ReLU", "sigmoid", "tanh")
-        """
-        # 입력 데이터가 1차원 리스트일 경우 2차원으로 변환
-        if isinstance(input_data[0], float):  # 단일 샘플일 경우
+        # 1. 입력 데이터가 1차원 리스트일 경우 2차원으로 변환
+        if isinstance(input_data[0], float): 
             input_data = [input_data]
-
-        # 입력 데이터와 가중치 값 강제 변환
-        input_data = [[float(x) for x in row] for row in input_data]
-        self.weights = [[float(w) for w in row] for row in self.weights]
-
-        # 가중치와 입력 데이터의 행렬 곱
+            
+        # print(f"input_data : {len(input_data[0])}")
+        # print(f"Layer size : {self.layer_size}")
+        # print(f"length of weights : {len(self.weights)}")
+        
+        # 2. 레이어의 노드와 가중치의 행렬 곱
         z = rnp.multiply_matrix(input_data, self.weights)
-
-        # 편향 추가
-        for i in range(len(z)):
-            z[i] = [zi + self.biases[j] for j, zi in enumerate(z[i])]
-        print("SS")
-        af.sigmoid(z)
-        print("SS")
-
-        # 활성화 함수 적용
+      
+        # print(f"행렬곱 결과 : {z}")
+        
+        # 3. 활성화 함수 적용
         if activation == "sigmoid":
             return af.sigmoid(z)
         elif activation == "ReLU":
@@ -81,5 +57,7 @@ class Layer:
             return af.tanh(z)
         elif activation == "leaky_relu":
             return af.leaky_relu(z)
+        elif activation == "softmax":
+            return af.softmax(z)
         else:
             raise ValueError(f"Invalid activation function: {activation}")
