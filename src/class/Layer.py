@@ -10,10 +10,10 @@ import activationFunc as af
 # 레이어
 class Layer:
     # 레이어 초기화
-    def __init__(self, layer_size, weight_init_method="None"):
+    def __init__(self, layer_size):
         self.layer_size = layer_size
-        self.nodes = None 
-        self.weights = None 
+        self.nodes = []
+        self.weights = [] 
         self.next_layer = None 
 
     # 가중치 초기화
