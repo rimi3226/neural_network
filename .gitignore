@@ -1,4 +1,5 @@
 /Image
 /Data
 /Fonts
-/src_prev/class/weights
+weights/
+__pycache__/
