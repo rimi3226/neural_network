@@ -22,10 +22,29 @@ def relu(x):
 
 
 def relu_grad(x):
-    grad = np.zeros(x)
-    grad[x>=0] = 1
+    # 입력이 스칼라인 경우 배열로 변환
+    x = np.array(x, ndmin=1)
+    grad = np.zeros_like(x)
+    grad[x >= 0] = 1
     return grad
     
+    
+def leaky_relu(x):
+    return np.where(x > 0, x, 0.01 * x)
+
+
+def leaky_relu_grad(x):
+    grad = np.where(x > 0, 1, 0.01)
+    return grad
+
+
+def tanh(x):
+    return np.tanh(x)
+
+
+def tanh_grad(x):
+    return 1 - np.tanh(x) ** 2
+
 
 def softmax(x):
     if x.ndim == 2:
