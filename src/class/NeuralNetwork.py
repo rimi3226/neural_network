@@ -46,37 +46,36 @@ class NeuralNetwork:
         target[int(data)] = 1
         self.target_layer = target
 
-
     # 순전파
     def forward_propagation(self):
         # (1) 입력층 -> 은닉층
         for i in range(0, len(self.layers)-2):
-            activation_val, gradient = self.layers[i].forward()
+            activation_val, gradient = self.layers[i].forward(what_layer=i)
             self.layers[i+1].set_layer(activation_val)
             self.layers[i+1].set_activation_gradient(gradient)
             
         # (2) 은닉층 -> 출력층
-        activation_val, gradient = self.layers[i].forward(activation="softmax")
+        activation_val, gradient = self.layers[i].forward(5,activation="softmax")
         self.layers[-1].set_layer(activation_val)
         self.layers[-1].set_activation_gradient(gradient)
-        
 
     # 역전파 
     def backward_propagation(self):
          # 1. 출력층에서의 역전파 계산
         self.layers[-1].get_gradient_output(self.target_layer)
-
         # 2. 출력층 이전의 모든 레이어에 대해 역전파 계산 및 가중치 업데이트
-        for i in range(len(self.layers) - 2, -1, -1):
+        for i in range(len(self.layers) - 2, 0, -1):
             # 다음 레이어 노드 값 가져오기
-            next_layer_nodes = [node.gradient for node in self.layers[i + 1].nodes]
+            next_layer_grads = [node.gradient for node in self.layers[i + 1].nodes]
+            self.layers[i].get_gradient(next_layer_grads)
             
-            # 현재 레이어에서의 역전파 계산
-            self.layers[i].get_gradient(next_layer_nodes)
-            
-            if i > 0: 
-                prev_layer_vals = [node.val for node in self.layers[i - 1].nodes]
-                self.layers[i].update_weight(prev_layer_vals)
+        # self.print_layer_details()
+        # 3. 가중치 업데이트하기
+        for i in range(1,len(self.layers)):
+            prev_layer_vals = [node.val for node in self.layers[i-1].nodes]
+            self.layers[i].update_weight(prev_layer_vals,i)
+        # self.print_layer_details()
+
                 
     # 가중치 저장
     def store_weight(self, file_name="model_weights.csv"):
@@ -101,8 +100,8 @@ class NeuralNetwork:
                 print(f"Node {node_idx + 1}:")
                 print(f"  Value: {node.val}")
                 print(f"  Weights: {node.weight}")
-                print(f"  Gradient: {node.gradient}")
-                print(f"  Activation Gradient: {node.activation_gradient}")
+                # print(f"  Gradient: {node.gradient}")
+                # print(f"  Activation Gradient: {node.activation_gradient}")
         print(f"\n==========================")
         
     # NeuralNetwork 클래스에 추가할 plot_output 메서드
@@ -119,4 +118,4 @@ class NeuralNetwork:
         plt.grid(True)
         plt.legend()
         plt.show()
-
+ 
