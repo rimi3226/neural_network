@@ -3,3 +3,4 @@
 /Fonts
 weights/
 __pycache__/
+*.csv

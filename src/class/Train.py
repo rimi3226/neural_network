@@ -87,7 +87,7 @@ class Train:
             correct += (prediction == np.argmax(target))
         return np.mean(losses), correct / len(X)
 
-    def save_results(self, results_path="results/results.csv", weights_path="results/weights.csv"):
+    def save_results(self, results_path="results.csv", weights_path="weights.csv"):
         history_df = pd.DataFrame(self.history)
         history_df.to_csv(results_path, index=False)
         self.model.store_weight(weights_path)
