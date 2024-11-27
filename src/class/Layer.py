@@ -8,13 +8,22 @@ import numpy as np
 from Node import Node 
 
 class Layer:
-    def __init__(self,layer_size,activation="relu",next_layer_size=0,learning_rate=0.1):
+    def __init__(self,layer_size,activation="relu",next_layer_size=0,learning_rate=0.1,dropout_rate=0.5):
         self.layer_size=layer_size                      # 레이어 크기
         self.nodes=[Node(activation) for _ in range(layer_size)]  # 레이어에 할당된 노드 리스트
         self.activation=activation                      # 해당 레이어의 활성화 함수
         self.next_layer_size=next_layer_size;
         self.learning_rate=learning_rate
-        
+        self.dropout_rate = dropout_rate  # Dropout 비율 추가
+        self.dropout_mask = np.ones(layer_size)  # Dropout 마스크 초기화
+
+    # Dropout 마스크 생성
+    def apply_dropout(self):
+        if self.dropout_rate > 0:
+            self.dropout_mask = np.random.rand(self.layer_size) > self.dropout_rate
+        else:
+            self.dropout_mask = np.ones(self.layer_size)
+
     # 노드 값 할당 
     def set_layer(self,data):
         for i in range(self.layer_size):

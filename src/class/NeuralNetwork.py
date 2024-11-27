@@ -9,9 +9,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../util
 import activationFunc as af
 from Node import Node
 from Layer import Layer
+from optimizer import SGDOptimizer
+from optimizer import AdamOptimizer
 
 class NeuralNetwork:
-    def __init__(self, input_layer_size, hidden_layers_size, output_layer_size, learning_rate=0.01, activation="relu", output_activation="softmax", weight_init="He"):
+    def __init__(self, input_layer_size, hidden_layers_size, output_layer_size, learning_rate=0.01,
+                 activation="relu", output_activation="softmax", weight_init="He", optimizer="adam", dropout=0):
         self.layers = []
         self.learning_rate = learning_rate
         self.activation = activation
@@ -19,21 +22,30 @@ class NeuralNetwork:
         self.target_layer = []
         self.weight_init = weight_init
         self.output_layer_size=output_layer_size
+        self.dropout_rate = dropout
+
+        # Optimizer 초기화
+        if optimizer == "adam":
+            self.optimizer = AdamOptimizer(learning_rate)
+        elif optimizer == "sgd":
+            self.optimizer = SGDOptimizer(learning_rate)
+
+        
         # 레이어 생성
         # (1) 입력층 생성
-        input_layer = Layer(input_layer_size, activation, hidden_layers_size[0], learning_rate)
+        input_layer = Layer(input_layer_size, activation, hidden_layers_size[0], learning_rate,dropout)
         input_layer.set_weight(weight_init)
         self.layers.append(input_layer)
 
         # (2) 은닉층 생성
         for i in range(len(hidden_layers_size)):
             next_layer_size = hidden_layers_size[i + 1] if i + 1 < len(hidden_layers_size) else output_layer_size
-            hidden_layer = Layer(hidden_layers_size[i], activation, next_layer_size, learning_rate)
+            hidden_layer = Layer(hidden_layers_size[i], activation, next_layer_size, learning_rate,dropout)
             hidden_layer.set_weight(weight_init)
             self.layers.append(hidden_layer)
 
         # (3) 출력층 생성
-        output_layer = Layer(output_layer_size, output_activation, 0, learning_rate)
+        output_layer = Layer(output_layer_size, output_activation, 0, learning_rate,dropout)
         self.layers.append(output_layer)
 
 

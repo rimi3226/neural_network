@@ -54,6 +54,8 @@ class Train:
             activation=self.activation,
             output_activation=self.output_activation,
             weight_init=self.weight_init,
+            optimizer=self.optimizer,
+            dropout=self.dropout,
         )
 
         for epoch in range(self.epoch):
