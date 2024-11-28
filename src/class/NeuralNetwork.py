@@ -14,7 +14,7 @@ from optimizer import AdamOptimizer
 
 class NeuralNetwork:
     def __init__(self, input_layer_size, hidden_layers_size, output_layer_size, learning_rate=0.01,
-                 activation="relu", output_activation="softmax", weight_init="He", optimizer="adam", dropout=0):
+                 activation="relu", output_activation="softmax", weight_init="He", optimizer="adam", dropout=0, loss_function="mse"):
         self.layers = []
         self.learning_rate = learning_rate
         self.activation = activation
@@ -23,7 +23,8 @@ class NeuralNetwork:
         self.weight_init = weight_init
         self.output_layer_size=output_layer_size
         self.dropout_rate = dropout
-
+        self.loss_function = loss_function
+        
         # Optimizer 초기화
         if optimizer == "adam":
             self.optimizer = AdamOptimizer(learning_rate)
@@ -73,8 +74,12 @@ class NeuralNetwork:
 
     # 역전파 
     def backward_propagation(self):
-         # 1. 출력층에서의 역전파 계산
-        self.layers[-1].get_gradient_output_MSE(self.target_layer)
+        # 손실 함수에 따라 출력층의 역전파 계산을 달리함
+        if self.loss_function == "mse":
+            self.layers[-1].get_gradient_output_MSE(self.target_layer)
+        elif self.loss_function == "cross_entropy":
+            self.layers[-1].get_gradient_output(self.target_layer)
+
         # 2. 출력층 이전의 모든 레이어에 대해 역전파 계산 및 가중치 업데이트
         for i in range(len(self.layers) - 2, 0, -1):
             # 다음 레이어 노드 값 가져오기

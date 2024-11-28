@@ -14,7 +14,7 @@ from NeuralNetwork import NeuralNetwork
 from data import preprocess_data
 
 class Train:
-    def __init__(self, epoch, batch, activation, output_activation, weight_init, optimizer, dropout, learning_rate):
+    def __init__(self, epoch, batch, activation, output_activation, weight_init, optimizer, dropout, learning_rate, loss_function):
         self.epoch = epoch
         self.batch = batch
         self.activation = activation
@@ -23,6 +23,7 @@ class Train:
         self.optimizer = optimizer
         self.dropout = dropout
         self.learning_rate = learning_rate
+        self.loss_function = loss_function
         self.model = None
         self.history = {"loss": [], "accuracy": [], "val_loss": [], "val_accuracy": []}
 
@@ -56,6 +57,7 @@ class Train:
             weight_init=self.weight_init,
             optimizer=self.optimizer,
             dropout=self.dropout,
+            loss_function=self.loss_function
         )
         for epoch in range(self.epoch):
             for i in range(0, len(X_train), self.batch):
@@ -78,18 +80,25 @@ class Train:
 
             print(f"Epoch {epoch + 1}/{self.epoch}, Loss: {train_loss}, Accuracy: {train_accuracy}, Val Loss: {val_loss}, Val Accuracy: {val_accuracy}")
 
+    # Evaluate 메서드 수정
     def evaluate(self, X, y):
+        if self.loss_function == "mse":
+            return self.evaluate_mse(X, y)
+        elif self.loss_function == "cross_entropy":
+            return self.evaluate_cross_entropy(X, y)
+
+    def evaluate_mse(self, X, y):
         losses = []
         correct = 0
         for x, target in zip(X, y):
             self.model.set_input_layer(x)
             self.model.forward_propagation()
             prediction = np.argmax([node.val for node in self.model.layers[-1].nodes])
-            losses.append(np.sum((target - prediction) ** 2))  # MSE Loss
+            loss = np.sum((target - prediction) ** 2)  # MSE Loss
+            losses.append(loss)
             correct += (prediction == np.argmax(target))
         return np.mean(losses), correct / len(X)
-    
-    # 평가 메서드에서 교차 엔트로피 손실 함수 사용
+
     def evaluate_cross_entropy(self, X, y):
         losses = []
         correct = 0
@@ -103,7 +112,8 @@ class Train:
             loss = -np.sum(target * np.log(output + 1e-9))  # log(0) 방지용 작은 값 추가
             losses.append(loss)
             correct += (prediction == np.argmax(target))
-        return np.mean(losses), correct / len(X) 
+        return np.mean(losses), correct / len(X)
+
 
     def save_results(self, results_path="results.csv", weights_path="weights.csv"):
         history_df = pd.DataFrame(self.history)
