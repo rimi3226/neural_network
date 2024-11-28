@@ -74,7 +74,7 @@ class NeuralNetwork:
     # 역전파 
     def backward_propagation(self):
          # 1. 출력층에서의 역전파 계산
-        self.layers[-1].get_gradient_output(self.target_layer)
+        self.layers[-1].get_gradient_output_MSE(self.target_layer)
         # 2. 출력층 이전의 모든 레이어에 대해 역전파 계산 및 가중치 업데이트
         for i in range(len(self.layers) - 2, 0, -1):
             # 다음 레이어 노드 값 가져오기

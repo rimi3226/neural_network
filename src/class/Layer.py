@@ -73,7 +73,7 @@ class Layer:
         return activation_val, gradient
         
     # 출력층 역전파 계산
-    def get_gradient_output(self,target):
+    def get_gradient_output_MSE(self,target):
         # 1. MSE 사용해서 손실함수 구하기
         output=np.array([node.val for node in self.nodes])
         gradient=-(output-target)
@@ -85,6 +85,16 @@ class Layer:
             # print(i," gradient: ",node.gradient)
             # print(i," activation_gradient: ",node.activation_gradient)
             
+    # 출력층 역전파 계산
+    def get_gradient_output(self, target):
+        # 교차 엔트로피 손실 함수 기반 그래디언트 계산
+        output = np.array([node.val for node in self.nodes])
+        gradient = output - target  # Cross-Entropy Loss의 Gradient 계산
+
+        # 각 노드의 gradient값 설정
+        for i, node in enumerate(self.nodes):
+            self.nodes[i].gradient = gradient[i]  # 활성화 함수의 미분은 softmax와 합쳐짐
+
     # 역전파 계산
     def get_gradient(self,next_layer_nodes):
         weights=np.transpose(np.array([node.weight for node in self.nodes]))

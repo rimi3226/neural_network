@@ -57,9 +57,9 @@ class Train:
             optimizer=self.optimizer,
             dropout=self.dropout,
         )
-
         for epoch in range(self.epoch):
             for i in range(0, len(X_train), self.batch):
+                # print("BATCH")
                 X_batch = X_train[i:i + self.batch]
                 y_batch = y_train[i:i + self.batch]
                 for x, y in zip(X_batch, y_batch):
@@ -88,21 +88,48 @@ class Train:
             losses.append(np.sum((target - prediction) ** 2))  # MSE Loss
             correct += (prediction == np.argmax(target))
         return np.mean(losses), correct / len(X)
+    
+    # 평가 메서드에서 교차 엔트로피 손실 함수 사용
+    def evaluate_cross_entropy(self, X, y):
+        losses = []
+        correct = 0
+        for x, target in zip(X, y):
+            self.model.set_input_layer(x)
+            self.model.forward_propagation()
+            output = np.array([node.val for node in self.model.layers[-1].nodes])
+            prediction = np.argmax(output)
+
+            # Cross-Entropy Loss 계산
+            loss = -np.sum(target * np.log(output + 1e-9))  # log(0) 방지용 작은 값 추가
+            losses.append(loss)
+            correct += (prediction == np.argmax(target))
+        return np.mean(losses), correct / len(X) 
 
     def save_results(self, results_path="results.csv", weights_path="weights.csv"):
         history_df = pd.DataFrame(self.history)
         history_df.to_csv(results_path, index=False)
         self.model.store_weight(weights_path)
-
+    
     def plot_history(self):
+        # Loss Plot
         plt.figure(figsize=(10, 6))
         plt.plot(self.history["loss"], label="Training Loss")
         plt.plot(self.history["val_loss"], label="Validation Loss")
-        plt.plot(self.history["accuracy"], label="Training Accuracy")
-        plt.plot(self.history["val_accuracy"], label="Validation Accuracy")
-        plt.title("Training History")
+        plt.title("Training and Validation Loss")
         plt.xlabel("Epochs")
-        plt.ylabel("Value")
+        plt.ylabel("Loss")
         plt.legend()
         plt.grid()
         plt.show()
+
+        # Accuracy Plot
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.history["accuracy"], label="Training Accuracy")
+        plt.plot(self.history["val_accuracy"], label="Validation Accuracy")
+        plt.title("Training and Validation Accuracy")
+        plt.xlabel("Epochs")
+        plt.ylabel("Accuracy")
+        plt.legend()
+        plt.grid()
+        plt.show()
+
