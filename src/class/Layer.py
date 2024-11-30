@@ -114,7 +114,7 @@ class Layer:
                 # print("------------------------------------")
                 # print(weight)
                 weight-=self.learning_rate*node.gradient*prev_layer_val[j]
-                self.nodes[i].weight[j]=weight
+                self.nodes[i-1].weight[j]=weight
                 # print(f"* {what_layer} result : ",self.learning_rate*node.gradient*prev_layer_val[j])
                 # print(f"* {what_layer} : ", node.gradient, " ", prev_layer_val[j])
                 # print(weight)

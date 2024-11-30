@@ -42,10 +42,10 @@ class Train:
             folds.append((X_train, y_train, X_val, y_val))
         return folds
 
-    def train(self, X_train, y_train, X_val, y_val):
+    def train(self, X_train, y_train, X_val, y_val,hidden_layer):
         input_size = 784
         output_size = 154
-        hidden_layers = [256, 200]
+        hidden_layers = [256,200,160]
 
         self.model = NeuralNetwork(
             input_layer_size=input_size,
@@ -80,6 +80,19 @@ class Train:
 
             print(f"Epoch {epoch + 1}/{self.epoch}, Loss: {train_loss}, Accuracy: {train_accuracy}, Val Loss: {val_loss}, Val Accuracy: {val_accuracy}")
 
+    # 특정 데이터의 출력층 값 확인
+    def test_sample_output(self, sample_data, label=None):
+        if self.model is None:
+            print("모델이 초기화되지 않았습니다. 먼저 train 메서드를 실행하세요.")
+            return
+        
+        print("\n=== Testing Sample Output ===")
+        self.model.set_input_layer(sample_data)  # 입력 데이터를 설정
+        self.model.forward_propagation_print()  # forward_propagation_print 실행
+        
+        if label is not None:
+            print(f"Actual Label: {label}")
+        print("=================================")
     # Evaluate 메서드 수정
     def evaluate(self, X, y):
         if self.loss_function == "mse":
@@ -114,6 +127,9 @@ class Train:
             correct += (prediction == np.argmax(target))
         return np.mean(losses), correct / len(X)
 
+    # def test_layer(self,data_num):
+    #     self.model.forward_propagation_print()
+        
 
     def save_results(self, results_path="results.csv", weights_path="weights.csv"):
         history_df = pd.DataFrame(self.history)
@@ -143,3 +159,15 @@ class Train:
         plt.grid()
         plt.show()
 
+    def plot_history_before(self):
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.history["loss"], label="Training Loss")
+        plt.plot(self.history["val_loss"], label="Validation Loss")
+        plt.plot(self.history["accuracy"], label="Training Accuracy")
+        plt.plot(self.history["val_accuracy"], label="Validation Accuracy")
+        plt.title("Training History")
+        plt.xlabel("Epochs")
+        plt.ylabel("Value")
+        plt.legend()
+        plt.grid()
+        plt.show()

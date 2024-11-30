@@ -121,7 +121,6 @@ class NeuralNetwork:
                 # print(f"  Activation Gradient: {node.activation_gradient}")
         print(f"\n==========================")
         
-    # NeuralNetwork 클래스에 추가할 plot_output 메서드
     def plot_output(self):
         # 출력층 노드 값 가져오기
         output = np.array([node.val for node in self.layers[-1].nodes])
